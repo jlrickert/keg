@@ -212,7 +212,7 @@ var Cmd = &Z.Cmd{
 	Commands: []*Z.Cmd{
 		editCmd, help.Cmd, conf.Cmd, vars.Cmd,
 		indexCmd, createCmd, currentCmd, directoryCmd, deleteCmd,
-		lastCmd, changesCmd, titlesCmd, initCmd, randomCmd,
+		lastCmd, changesCmd, titlesCmd, initCmd, randomCmd, publishCmd,
 		importCmd, grepCmd, viewCmd, columnsCmd, linkCmd, tagCmd,
 	},
 
@@ -352,8 +352,15 @@ var deleteCmd = &Z.Cmd{
 		if err := DexRemove(keg.Path, entry); err != nil {
 			return err
 		}
-		return Publish(keg.Path)
 
+		publish, err := shouldPublish()
+		if err != nil {
+			return err
+		}
+		if publish {
+			return Publish(keg.Path)
+		}
+		return nil
 	},
 }
 
@@ -526,7 +533,14 @@ var initCmd = &Z.Cmd{
 			return err
 		}
 
-		return Publish(dir)
+		publish, err := shouldPublish()
+		if err != nil {
+			return err
+		}
+		if publish {
+			return Publish(dir)
+		}
+		return nil
 	},
 }
 var editCmd = &Z.Cmd{
@@ -553,6 +567,17 @@ var editCmd = &Z.Cmd{
 			return err
 		}
 
+		_publish := func() error {
+			publish, err := shouldPublish()
+			if err != nil {
+				return err
+			}
+			if !publish {
+				return nil
+			}
+			return Publish(keg.Path)
+		}
+
 		path := filepath.Join(keg.Path, id, `README.md`)
 		if !fs.Exists(path) {
 			return fmt.Errorf(_NodeNotFound, id)
@@ -571,7 +596,7 @@ var editCmd = &Z.Cmd{
 			if err := DexRemove(keg.Path, entry); err != nil {
 				return err
 			}
-			return Publish(keg.Path)
+			return _publish()
 		} else {
 			if err := DexUpdate(keg.Path, entry); err != nil {
 				return err
@@ -580,7 +605,7 @@ var editCmd = &Z.Cmd{
 
 		atime := fs.ModTime(path)
 		if atime.After(btime) {
-			return Publish(keg.Path)
+			return _publish()
 		}
 		return nil
 
@@ -631,7 +656,14 @@ var createCmd = &Z.Cmd{
 			return err
 		}
 
-		return Publish(keg.Path)
+		publish, err := shouldPublish()
+		if err != nil {
+			return err
+		}
+		if publish {
+			return Publish(keg.Path)
+		}
+		return nil
 	},
 }
 
@@ -699,8 +731,14 @@ var importCmd = &Z.Cmd{
 			return err
 		}
 
-		return Publish(keg.Path)
-
+		publish, err := shouldPublish()
+		if err != nil {
+			return err
+		}
+		if publish {
+			return Publish(keg.Path)
+		}
+		return nil
 	},
 }
 
@@ -1054,4 +1092,55 @@ var tagCmd = &Z.Cmd{
 
 		return Tag(keg.Path, id, args[0])
 	},
+}
+
+var publishCmd = &Z.Cmd{
+	Name:        "publish",
+	Aliases:     []string{`pub`},
+	Summary:     help.S(_publish),
+	Description: help.D(_publish),
+	Commands:    []*Z.Cmd{help.Cmd},
+	Call: func(x *Z.Cmd, args ...string) error {
+		keg, err := current(x.Caller)
+		if err != nil {
+			return err
+		}
+		return Publish(keg.Path)
+	},
+	MaxArgs:  1,
+	UseConf:  true,
+	UseVars:  true,
+	ConfVars: true,
+}
+
+func shouldPublish() (bool, error) {
+	var ok, exists = true, false
+
+	// Possible values that publish may be
+	symbolMap := map[string]bool{
+		`true`:  true,
+		`false`: false,
+		`yes`:   true,
+		`no`:    false,
+	}
+
+	// `publish` variable take precedence if set
+	variableValue := Z.Vars.Get(`.publish`)
+	ok, exists = symbolMap[variableValue]
+	if exists {
+		return ok, nil
+	}
+
+	// Use `publish` in confing if found
+	configValue, err := Z.Conf.Query(`.publish`)
+	if err != nil {
+		return false, err
+	}
+	ok, exists = symbolMap[configValue]
+	if exists {
+		return ok, nil
+	}
+
+	// Default value
+	return true, err
 }
