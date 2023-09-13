@@ -19,7 +19,7 @@ import (
 	_fs "github.com/rwxrob/fs"
 	"github.com/rwxrob/fs/dir"
 	"github.com/rwxrob/fs/file"
-	"github.com/rwxrob/keg/kegml"
+	"github.com/rwxrob/keg/markdown"
 	"github.com/rwxrob/term"
 	"github.com/rwxrob/to"
 )
@@ -86,7 +86,7 @@ func ScanDex(kegdir string) (*Dex, error) {
 	})
 	for _, d := range dirs {
 		_, i := _fs.LatestChange(d.Path)
-		title, _ := kegml.ReadTitle(d.Path)
+		title, _ := markdown.ReadTitle(d.Path)
 		id, err := strconv.Atoi(d.Info.Name())
 		if err != nil {
 			continue
@@ -385,7 +385,7 @@ func ImportNode(kegpath, target string) error {
 		return fmt.Errorf(_CantGetNextNode, target)
 	}
 
-	next.T, err = kegml.ReadTitle(filepath.Join(target, `README.md`))
+	next.T, err = markdown.ReadTitle(filepath.Join(target, `README.md`))
 	if err != nil {
 		return err
 	}

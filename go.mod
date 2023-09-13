@@ -15,10 +15,12 @@ require (
 	github.com/rwxrob/term v0.2.9
 	github.com/rwxrob/to v0.12.1
 	github.com/rwxrob/vars v0.6.3
+	github.com/yuin/goldmark v1.5.6
+	github.com/yuin/goldmark-meta v1.1.0
 )
 
 require (
-	github.com/a8m/envsubst v1.3.0 // indirect
+	github.com/a8m/envsubst v1.4.0 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/alecthomas/participle/v2 v2.0.0-beta.5 // indirect
 	github.com/aymanbagabas/go-osc52 v1.2.1 // indirect
@@ -48,7 +50,6 @@ require (
 	github.com/rwxrob/fn v0.4.0 // indirect
 	github.com/rwxrob/structs v0.6.0 // indirect
 	github.com/rwxrob/yq v0.3.2 // indirect
-	github.com/yuin/goldmark v1.5.3 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
 	golang.org/x/net v0.4.0 // indirect
@@ -57,5 +58,6 @@ require (
 	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	gopkg.in/op/go-logging.v1 v1.0.0-20160211212156-b2cb9fa56473 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
