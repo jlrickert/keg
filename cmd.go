@@ -1105,6 +1105,9 @@ var publishCmd = &Z.Cmd{
 		if err != nil {
 			return err
 		}
+		if err = MakeDex(keg.Path); err != nil {
+			return err
+		}
 		return Publish(keg.Path)
 	},
 	MaxArgs:  1,
